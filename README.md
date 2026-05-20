@@ -1,744 +1,371 @@
-\# Collaborative Document Store
-
-
+# Collaborative Document Store
 
 A production-ready collaborative wiki backend built using Node.js, Express.js, MongoDB, and Docker.
-
 This project implements advanced backend concepts such as Optimistic Concurrency Control (OCC), full-text search, analytics aggregation pipelines, schema migration strategies, and Dockerized deployment.
 
+---
 
+# Features
 
-\---
+* CRUD APIs for collaborative documents
+* Optimistic Concurrency Control (OCC)
+* Conflict detection with version handling
+* Revision history tracking
+* Full-text search using MongoDB text indexes
+* Tag-based filtering
+* Most edited documents analytics
+* Tag co-occurrence analytics
+* Lazy schema migration
+* Background migration script
+* Seed script for generating 1000+ documents
+* Dockerized setup using Docker Compose
+* MongoDB integration with Mongoose
 
+---
 
+# Tech Stack
 
-\# Features
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+* Docker
+* Docker Compose
 
+---
 
-
-\* CRUD APIs for collaborative documents
-
-\* Optimistic Concurrency Control (OCC)
-
-\* Conflict detection with version handling
-
-\* Revision history tracking
-
-\* Full-text search using MongoDB text indexes
-
-\* Tag-based filtering
-
-\* Most edited documents analytics
-
-\* Tag co-occurrence analytics
-
-\* Lazy schema migration
-
-\* Background migration script
-
-\* Seed script for generating 1000+ documents
-
-\* Dockerized setup using Docker Compose
-
-\* MongoDB integration with Mongoose
-
-
-
-\---
-
-
-
-\# Tech Stack
-
-
-
-\* Node.js
-
-\* Express.js
-
-\* MongoDB
-
-\* Mongoose
-
-\* Docker
-
-\* Docker Compose
-
-
-
-\---
-
-
-
-\# Project Structure
-
-
+# Project Structure
 
 ```text
-
 Collaborative-Document-Store
-
 │
-
 ├── scripts
-
-│   ├── migrate\_author\_schema.js
-
+│   ├── migrate_author_schema.js
 │   └── seed.js
-
 │
-
 ├── src
-
 │   ├── config
-
 │   │   └── db.js
-
 │   │
-
 │   ├── controllers
-
 │   │   └── documentController.js
-
 │   │
-
 │   ├── models
-
 │   │   └── documentModel.js
-
 │   │
-
 │   ├── routes
-
 │   │   └── documentRoutes.js
-
 │   │
-
 │   └── server.js
-
 │
-
 ├── .env.example
-
 ├── .gitignore
-
 ├── Dockerfile
-
 ├── docker-compose.yml
-
 ├── package.json
-
 └── README.md
-
 ```
 
+---
 
+# Installation
 
-\---
-
-
-
-\# Installation
-
-
-
-\## Clone Repository
-
-
+## Clone Repository
 
 ```bash
-
-git clone https://github.com/Santhoshi003/Collaborative\_Document\_Store.git
-
+git clone https://github.com/Santhoshi003/Collaborative_Document_Store.git
 ```
 
-
-
-\## Open Project
-
-
+## Open Project
 
 ```bash
-
-cd Collaborative\_Document\_Store
-
+cd Collaborative_Document_Store
 ```
 
+---
 
-
-\---
-
-
-
-\# Environment Variables
-
-
+# Environment Variables
 
 Create a `.env` file in the root directory.
 
-
-
 Example:
 
-
-
 ```env
-
 PORT=5000
-
-MONGO\_URI=mongodb://mongo:27017/wikiDB
-
-DATABASE\_NAME=wikiDB
-
+MONGO_URI=mongodb://mongo:27017/wikiDB
+DATABASE_NAME=wikiDB
 ```
 
+---
 
-
-\---
-
-
-
-\# Run Using Docker
-
-
+# Run Using Docker
 
 ```bash
-
 docker-compose up --build
-
 ```
-
-
 
 Server will run on:
 
-
-
 ```text
-
 http://localhost:5000
-
 ```
 
+---
 
-
-\---
-
-
-
-\# Seed Database
-
-
+# Seed Database
 
 Run seed script:
 
-
-
 ```bash
-
 npm run seed
-
 ```
-
-
 
 This generates 1000 sample documents automatically.
 
+---
 
-
-\---
-
-
-
-\# Run Migration Script
-
-
+# Run Migration Script
 
 ```bash
-
 npm run migrate
-
 ```
-
-
 
 This converts old author schema into new structured schema.
 
+---
 
+# API Endpoints
 
-\---
+## Create Document
 
-
-
-\# API Endpoints
-
-
-
-\## Create Document
-
-
-
-\### POST
-
-
+### POST
 
 ```text
-
 /api/documents
-
 ```
 
-
-
-\### Request Body
-
-
+### Request Body
 
 ```json
-
 {
-
-&#x20; "title": "MongoDB Guide",
-
-&#x20; "content": "MongoDB database tutorial",
-
-&#x20; "tags": \["mongodb", "guide"],
-
-&#x20; "authorName": "Santhoshi",
-
-&#x20; "authorEmail": "santhoshi@gmail.com"
-
+  "title": "MongoDB Guide",
+  "content": "MongoDB database tutorial",
+  "tags": ["mongodb", "guide"],
+  "authorName": "Santhoshi",
+  "authorEmail": "santhoshi@gmail.com"
 }
-
 ```
 
+---
 
+## Get Document
 
-\---
-
-
-
-\## Get Document
-
-
-
-\### GET
-
-
+### GET
 
 ```text
-
 /api/documents/:slug
-
 ```
-
-
 
 Example:
 
-
-
 ```text
-
 /api/documents/mongodb-guide
-
 ```
 
+---
 
+## Update Document with OCC
 
-\---
-
-
-
-\## Update Document with OCC
-
-
-
-\### PUT
-
-
+### PUT
 
 ```text
-
 /api/documents/:slug
-
 ```
 
-
-
-\### Request Body
-
-
+### Request Body
 
 ```json
-
 {
-
-&#x20; "title": "Updated Title",
-
-&#x20; "content": "Updated Content",
-
-&#x20; "version": 1
-
+  "title": "Updated Title",
+  "content": "Updated Content",
+  "version": 1
 }
-
 ```
 
+### OCC Behavior
 
+* If version matches → update succeeds
+* If version mismatches → returns `409 Conflict`
 
-\### OCC Behavior
+---
 
+## Delete Document
 
-
-\* If version matches → update succeeds
-
-\* If version mismatches → returns `409 Conflict`
-
-
-
-\---
-
-
-
-\## Delete Document
-
-
-
-\### DELETE
-
-
+### DELETE
 
 ```text
-
 /api/documents/:slug
-
 ```
 
+---
 
+## Full Text Search
 
-\---
-
-
-
-\## Full Text Search
-
-
-
-\### GET
-
-
+### GET
 
 ```text
-
 /api/search?q=mongodb
-
 ```
 
+---
 
+## Search with Tags
 
-\---
-
-
-
-\## Search with Tags
-
-
-
-\### GET
-
-
+### GET
 
 ```text
-
-/api/search?q=mongodb\&tags=guide
-
+/api/search?q=mongodb&tags=guide
 ```
 
+---
 
+## Most Edited Documents Analytics
 
-\---
-
-
-
-\## Most Edited Documents Analytics
-
-
-
-\### GET
-
-
+### GET
 
 ```text
-
 /api/analytics/most-edited
-
 ```
 
+---
 
+## Tag Co-occurrence Analytics
 
-\---
-
-
-
-\## Tag Co-occurrence Analytics
-
-
-
-\### GET
-
-
+### GET
 
 ```text
-
 /api/analytics/tag-cooccurrence
-
 ```
 
+---
 
-
-\---
-
-
-
-\# Optimistic Concurrency Control (OCC)
-
-
+# Optimistic Concurrency Control (OCC)
 
 This project uses version-based OCC to prevent lost updates during simultaneous document editing.
 
+### Workflow
 
+1. Client fetches document with current version
+2. Client sends update request with version number
+3. Server updates document only if versions match
+4. If versions mismatch:
 
-\### Workflow
+   * update fails
+   * API returns `409 Conflict`
+   * latest document version is returned
 
+---
 
-
-1\. Client fetches document with current version
-
-2\. Client sends update request with version number
-
-3\. Server updates document only if versions match
-
-4\. If versions mismatch:
-
-
-
-&#x20;  \* update fails
-
-&#x20;  \* API returns `409 Conflict`
-
-&#x20;  \* latest document version is returned
-
-
-
-\---
-
-
-
-\# Full Text Search
-
-
+# Full Text Search
 
 MongoDB text indexes are used on:
 
-
-
-\* title
-
-\* content
-
-
+* title
+* content
 
 Search results are sorted using MongoDB text relevance score.
 
+---
 
+# Analytics
 
-\---
-
-
-
-\# Analytics
-
-
-
-\## Most Edited Documents
-
-
+## Most Edited Documents
 
 Uses MongoDB aggregation pipelines to:
 
+* calculate revision counts
+* sort documents
+* return top edited documents
 
-
-\* calculate revision counts
-
-\* sort documents
-
-\* return top edited documents
-
-
-
-\## Tag Co-occurrence
-
-
+## Tag Co-occurrence
 
 Calculates frequently appearing tag combinations across documents.
 
+---
 
+# Schema Migration
 
-\---
-
-
-
-\# Schema Migration
-
-
-
-\## Lazy Migration
-
-
+## Lazy Migration
 
 Old schema:
 
-
-
 ```json
-
 "author": "Santhoshi"
-
 ```
-
-
 
 New schema:
 
-
-
 ```json
-
 "author": {
-
-&#x20; "id": null,
-
-&#x20; "name": "Santhoshi",
-
-&#x20; "email": null
-
+  "id": null,
+  "name": "Santhoshi",
+  "email": null
 }
-
 ```
-
-
 
 Documents are automatically transformed during reads.
 
+---
 
-
-\---
-
-
-
-\# Background Migration Script
-
-
+# Background Migration Script
 
 File:
 
-
-
 ```text
-
-scripts/migrate\_author\_schema.js
-
+scripts/migrate_author_schema.js
 ```
-
-
 
 This script:
 
+* scans old documents
+* converts author schema
+* updates database records
 
+---
 
-\* scans old documents
-
-\* converts author schema
-
-\* updates database records
-
-
-
-\---
-
-
-
-\# Seed Script
-
-
+# Seed Script
 
 File:
 
-
-
 ```text
-
 scripts/seed.js
-
 ```
-
-
 
 Generates:
 
+* 1000+ sample documents
+* sample metadata
+* sample tags
 
+---
 
-\* 1000+ sample documents
-
-\* sample metadata
-
-\* sample tags
-
-
-
-\---
-
-
-
-\# Docker Setup
-
-
+# Docker Setup
 
 The application is fully containerized using Docker Compose.
 
-
-
 Includes:
 
+* MongoDB container
+* API container
+* persistent database volume
+* health checks
 
+---
 
-\* MongoDB container
-
-\* API container
-
-\* persistent database volume
-
-\* health checks
-
-
-
-\---
-
-
-
-\# Author
-
-
+# Author
 
 Santhoshi
 
-
-
 GitHub Repository:
 
-
-
-\[Collaborative\_Document\_Store Repository](https://github.com/Santhoshi003/Collaborative\_Document\_Store?utm\_source=chatgpt.com)
-
-
-
+[Collaborative_Document_Store Repository](https://github.com/Santhoshi003/Collaborative_Document_Store?utm_source=chatgpt.com)
